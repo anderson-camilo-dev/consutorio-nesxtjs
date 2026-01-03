@@ -143,6 +143,17 @@ export default function Home() {
               <p>
                 <strong>Plantão:</strong> {funcionarioDetalhes.horarioInicio} - {funcionarioDetalhes.horarioFim}
               </p>
+              <p>
+                <strong>Tarefas neste mês:</strong>{" "}
+                {
+                  eventos.filter(
+                    (e) =>
+                      e.medicoId === funcionarioDetalhes.id &&
+                      new Date(e.data).getMonth() === dataAtual.getMonth() &&
+                      new Date(e.data).getFullYear() === dataAtual.getFullYear()
+                  ).length
+                }
+              </p>
               {funcionarioDetalhes.fotoUrl && (
                 <img src={funcionarioDetalhes.fotoUrl} className="w-32 h-32 rounded-full object-cover mx-auto" alt={funcionarioDetalhes.nome} />
               )}
