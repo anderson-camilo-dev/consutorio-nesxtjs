@@ -106,7 +106,7 @@ export default function AtendenteForm({
       <div className="flex gap-3">
         <button
           onClick={salvar}
-          className="flex-1 bg-indigo-600 text-white py-2 rounded-lg hover:bg-indigo-700 transition"
+          className="flex-1 bg-cyan-800 text-white py-2 rounded-lg hover:bg-cyan-700 transition"
         >
           Salvar
         </button>

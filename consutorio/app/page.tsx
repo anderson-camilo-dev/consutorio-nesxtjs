@@ -59,9 +59,9 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen bg-white/95 p-6 space-y-6">
-      <div className="max-w-7xl mx-auto grid grid-cols-7 gap-6">
-        <div className="col-span-2 space-y-6">
+    <main className="min-h-screen  bg-white/95 p-6 space-y-6">
+      <div className="max-w-7xl mx-auto grid grid-cols-7 ">
+        <div className="col-span-2 pt-14 space-y-6">
           <MiniCalendario
             eventos={eventos}
             selectedDate={dataAtual}
@@ -86,7 +86,7 @@ export default function Home() {
               setFuncionarioParaEditar(null);
               setMostrarModalFunc(true);
             }}
-            className="bg-cyan-900 text-white px-5 py-2 rounded-lg shadow hover:bg-cyan-600 transition"
+            className="bg-cyan-800 text-white px-5 py-2 rounded-lg shadow hover:bg-cyan-600 transition"
           >
             + Cadastrar Funcionário
           </button>
@@ -151,7 +151,7 @@ export default function Home() {
         </Modal>
       )}
 
-      <div className="bg-white p-4 max-w-7xl h-170 mx-auto rounded-lg shadow my-6">
+      <div className="  max-w-7xl  mx-auto rounded-lg  my-6">
   <AtendimentoChart eventos={eventos} />
 </div>
 

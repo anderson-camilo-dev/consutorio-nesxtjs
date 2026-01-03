@@ -9,7 +9,8 @@ interface AppointmentFormProps {
     initialStart?: Date;
     initialEnd?: Date;
   };
-  medicos?: any[]; // médicos disponíveis
+  medicos?: any[];
+  eventos?: any[];
   onSave: (event: any) => void;
   onCancel: () => void;
 }
@@ -17,6 +18,7 @@ interface AppointmentFormProps {
 export default function AppointmentForm({
   slotInfo = {},
   medicos = [],
+  eventos = [],
   onSave,
   onCancel,
 }: AppointmentFormProps) {
@@ -35,16 +37,36 @@ export default function AppointmentForm({
   const [medicosDisponiveis, setMedicosDisponiveis] = useState<any[]>([]);
   const [medicoSelecionado, setMedicoSelecionado] = useState("");
 
-  // Horas cheias para select
   const horas = Array.from({ length: 24 }, (_, i) =>
     i.toString().padStart(2, "0") + ":00"
   );
 
   const horaParaMinutos = (hora: string) => {
-    const [h, m] = hora.trim().split(":").map(Number);
+    const [h, m] = hora.split(":").map(Number);
     return h * 60 + m;
   };
 
+  // 🔹 Checa se o médico já tem algum atendimento no horário
+  const medicoTemConflito = (medicoId: string, start: Date, end: Date) => {
+    return eventos.some((ev) => {
+      if (ev.medicoId !== medicoId) return false;
+
+      const evStart = new Date(ev.start);
+      const evEnd = new Date(ev.end);
+
+      const mesmoDia =
+        evStart.getFullYear() === start.getFullYear() &&
+        evStart.getMonth() === start.getMonth() &&
+        evStart.getDate() === start.getDate();
+
+      if (!mesmoDia) return false;
+
+      // verifica sobreposição
+      return start < evEnd && end > evStart;
+    });
+  };
+
+  // 🔹 Calcula médicos disponíveis
   useEffect(() => {
     if (!horaInicio || !horaFim) {
       setMedicosDisponiveis([]);
@@ -52,29 +74,40 @@ export default function AppointmentForm({
       return;
     }
 
-    const startMin = horaParaMinutos(horaInicio);
-    const endMin = horaParaMinutos(horaFim);
+    const start = new Date(date);
+    const end = new Date(date);
+    const [hI] = horaInicio.split(":");
+    const [hF] = horaFim.split(":");
+    start.setHours(Number(hI), 0, 0, 0);
+    end.setHours(Number(hF), 0, 0, 0);
 
-    const disp = medicos.filter((med: any) => {
-      if (
-        typeof med.horarioInicio !== "string" ||
-        typeof med.horarioFim !== "string" ||
-        !med.horarioInicio.includes(":") ||
-        !med.horarioFim.includes(":")
-      ) {
-        return false;
-      }
+    // filtra apenas os médicos livres no horário
+    const disponiveis = medicos.filter((med: any) => {
+      if (!med.horarioInicio || !med.horarioFim) return false;
 
       const medStart = horaParaMinutos(med.horarioInicio);
       const medEnd = horaParaMinutos(med.horarioFim);
+      const startMin = horaParaMinutos(horaInicio);
+      const endMin = horaParaMinutos(horaFim);
 
-      return medStart <= startMin && medEnd >= endMin;
+      // fora do horário de trabalho do médico
+      if (medStart > startMin || medEnd < endMin) return false;
+
+      // já tem atendimento nesse horário? bloqueia só para ele
+      if (medicoTemConflito(med.id, start, end)) return false;
+
+      return true;
     });
 
-    setMedicosDisponiveis(disp);
-    if (disp.length === 1) setMedicoSelecionado(disp[0].id);
-    else setMedicoSelecionado("");
-  }, [horaInicio, horaFim, medicos]);
+    setMedicosDisponiveis(disponiveis);
+
+    // se só tiver um médico livre, seleciona automaticamente
+    if (disponiveis.length === 1) {
+      setMedicoSelecionado(disponiveis[0].id);
+    } else {
+      setMedicoSelecionado("");
+    }
+  }, [horaInicio, horaFim, medicos, eventos, date]);
 
   const salvar = () => {
     if (!nome.trim() || !horaInicio || !horaFim) {
@@ -83,30 +116,31 @@ export default function AppointmentForm({
     }
 
     if (medicosDisponiveis.length === 0) {
-      alert("Não há médicos disponíveis nesse horário!");
+      alert("Nenhum médico disponível nesse horário.");
       return;
     }
 
     if (medicosDisponiveis.length > 1 && !medicoSelecionado) {
-      alert("Escolha um dos médicos disponíveis!");
+      alert("Escolha um médico disponível.");
       return;
     }
 
-    const [hI] = horaInicio.split(":");
-    const [hF] = horaFim.split(":");
+    const medicoFinal =
+      medicosDisponiveis.find((m) => m.id === medicoSelecionado) ||
+      medicosDisponiveis[0];
 
     const start = new Date(date);
-    start.setHours(parseInt(hI), 0);
-
     const end = new Date(date);
-    end.setHours(parseInt(hF), 0);
+    start.setHours(Number(horaInicio.split(":")[0]), 0, 0, 0);
+    end.setHours(Number(horaFim.split(":")[0]), 0, 0, 0);
 
     onSave({
       title: nome,
       start,
       end,
       status,
-      medicoId: medicoSelecionado || medicosDisponiveis[0].id,
+      medicoId: medicoFinal.id,
+      medicoNome: medicoFinal.nome,
     });
   };
 
@@ -127,12 +161,11 @@ export default function AppointmentForm({
           >
             <option value="">Selecione</option>
             {horas.map((h) => (
-              <option key={h} value={h}>
-                {h}
-              </option>
+              <option key={h}>{h}</option>
             ))}
           </select>
         </div>
+
         <div>
           <label>Fim</label>
           <select
@@ -142,9 +175,7 @@ export default function AppointmentForm({
           >
             <option value="">Selecione</option>
             {horas.map((h) => (
-              <option key={h} value={h}>
-                {h}
-              </option>
+              <option key={h}>{h}</option>
             ))}
           </select>
         </div>
@@ -167,7 +198,7 @@ export default function AppointmentForm({
         <option>Confirmado</option>
       </select>
 
-      {medicosDisponiveis.length > 1 && (
+      
         <select
           value={medicoSelecionado}
           onChange={(e) => setMedicoSelecionado(e.target.value)}
@@ -180,11 +211,11 @@ export default function AppointmentForm({
             </option>
           ))}
         </select>
-      )}
+      
 
       {medicosDisponiveis.length === 0 && horaInicio && horaFim && (
         <p className="text-red-500 text-sm">
-          Sem médico disponível nesse horário.
+          Nenhum médico disponível nesse horário.
         </p>
       )}
 
@@ -196,7 +227,6 @@ export default function AppointmentForm({
               ? "bg-indigo-600"
               : "bg-gray-400 cursor-not-allowed"
           }`}
-          disabled={!nome.trim() || !horaInicio || !horaFim}
         >
           Salvar
         </button>

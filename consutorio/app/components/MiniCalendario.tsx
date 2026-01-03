@@ -42,7 +42,7 @@ export default function MiniCalendario({
   const prevMonth = () => onChangeMonth(addMonths(selectedDate, -1));
 
   return (
-    <div className="w-full max-w-xs p-4 bg-white rounded-lg shadow-lg">
+    <div className="w-full max-w-xs p-4 shadow-md bg-white rounded-lg ">
       {/* Header */}
       <div className="flex justify-between items-center mb-2">
         <button
@@ -84,8 +84,8 @@ export default function MiniCalendario({
                 relative p-2 rounded-lg transition
                 ${
                   isToday
-                    ? "bg-indigo-600 text-white"
-                    : "hover:bg-indigo-100 text-gray-800"
+                    ? "bg-cyan-800 text-white"
+                    : "hover:bg-indigo-100 bg-zinc-100 text-gray-800"
                 }
               `}
             >

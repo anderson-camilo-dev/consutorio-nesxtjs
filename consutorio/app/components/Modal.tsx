@@ -2,7 +2,7 @@
 
 export default function Modal({ children, onClose }: any) {
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-40 backdrop-blur-sm flex items-center justify-center z-50">
+    <div className="fixed inset-0 bg-black/10 min-h-screen  backdrop-blur-sm flex items-center justify-center z-50">
       <div className="bg-white rounded-xl shadow-2xl p-6 w-full max-w-lg relative">
         <button
           onClick={onClose}

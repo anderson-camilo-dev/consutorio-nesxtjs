@@ -4,20 +4,24 @@ import {
   Chart as ChartJS,
   CategoryScale,
   LinearScale,
-  BarElement,
+  PointElement,
+  LineElement,
   Title,
   Tooltip,
   Legend,
+  Filler,
 } from "chart.js";
-import { Bar } from "react-chartjs-2";
+import { Line } from "react-chartjs-2";
 
 ChartJS.register(
   CategoryScale,
   LinearScale,
-  BarElement,
+  PointElement,
+  LineElement,
   Title,
   Tooltip,
-  Legend
+  Legend,
+  Filler
 );
 
 interface AtendimentoChartProps {
@@ -27,50 +31,78 @@ interface AtendimentoChartProps {
 export default function AtendimentoChart({
   eventos = [],
 }: AtendimentoChartProps) {
-  const mesAtual = new Date().getMonth();
-  const anoAtual = new Date().getFullYear();
+  const hoje = new Date();
+  const mesAtual = hoje.getMonth();
+  const anoAtual = hoje.getFullYear();
 
-  const atendimentosPorMedico: Record<string, number> = {};
+  // Dias do mês atual
+  const diasNoMes = new Date(anoAtual, mesAtual + 1, 0).getDate();
+
+  const atendimentosPorDia = Array(diasNoMes).fill(0);
 
   eventos.forEach((evento) => {
     const data = new Date(evento.start);
+
     if (
       data.getMonth() === mesAtual &&
       data.getFullYear() === anoAtual
     ) {
-      const medico = evento.medicoId || "Sem médico";
-      atendimentosPorMedico[medico] =
-        (atendimentosPorMedico[medico] || 0) + 1;
+      const dia = data.getDate();
+      atendimentosPorDia[dia - 1] += 1;
     }
   });
 
   const data = {
-    labels: Object.keys(atendimentosPorMedico),
+    labels: Array.from({ length: diasNoMes }, (_, i) => `${i + 1}`),
     datasets: [
       {
-        label: "Atendimentos no mês",
-        data: Object.values(atendimentosPorMedico),
-        backgroundColor: "rgba(59, 130, 246, 0.7)",
+        label: "Atendimentos",
+        data: atendimentosPorDia,
+        fill: true,
+        tension: 0.4, // 👈 efeito montanha-russa
+        borderColor: "#3B82F6",
+        backgroundColor: "rgba(59, 130, 246, 0.2)",
+        pointRadius: 4,
+        pointBackgroundColor: "#3B82F6",
       },
     ],
   };
 
+  const options = {
+    responsive: true,
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        backgroundColor: "#111827",
+        titleColor: "#fff",
+        bodyColor: "#fff",
+        padding: 12,
+      },
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+        ticks: { precision: 0 },
+        grid: { color: "#E5E7EB" },
+      },
+      x: {
+        grid: { display: false },
+      },
+    },
+  };
+
   return (
-    <Bar
-      data={data}
-      options={{
-        responsive: true,
-        plugins: {
-          legend: { display: false },
-          title: {
-            display: true,
-            text: "Atendimentos por Médico (Mês Atual)",
-          },
-        },
-        scales: {
-          y: { beginAtZero: true},
-        },
-      }}
-    />
+    <div className="rounded-xl bg-white p-6 shadow-md">
+      <div className="mb-4">
+        <h2 className="text-lg font-semibold text-gray-800">
+          Atendimentos por Dia
+        </h2>
+        <p className="text-sm text-gray-500">
+          Evolução diária no mês atual
+        </p>
+      </div>
+
+      <Line data={data} options={options} />
+    </div>
   );
 }

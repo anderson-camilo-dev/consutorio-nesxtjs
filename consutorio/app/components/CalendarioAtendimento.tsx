@@ -82,7 +82,7 @@ export default function CalendarioAtendimentos({
 
   return (
     <>
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex items-center  justify-between mb-4">
         <h1 className="text-3xl font-bold text-gray-800">
           📅 Agenda de Atendimentos
         </h1>
@@ -91,13 +91,13 @@ export default function CalendarioAtendimentos({
             setSlotSelecionado({ date: new Date() });
             setMostrarModalCriar(true);
           }}
-          className="bg-cyan-900 text-white px-5 py-2 rounded-lg shadow hover:bg-cyan-600 transition"
+          className="bg-cyan-800 text-white/90 px-5 py-2 rounded-lg shadow hover:bg-cyan-600 transition"
         >
           + Novo Atendimento
         </button>
       </div>
 
-      <div className="bg-white rounded-lg shadow-lg p-4 h-[700px]">
+      <div className="bg-white/70  text-black/50  rounded-lg shadow-md p-4 h-[700px]">
         <Calendar
           localizer={localizador}
           events={eventos}
@@ -130,13 +130,30 @@ export default function CalendarioAtendimentos({
           components={{
             event: ({ event }: any) => (
               <div
-                className={`text-white text-sm px-1 py-0.5 rounded ${
-                  event.status === "Confirmado"
-                    ? "bg-green-500"
-                    : "bg-yellow-400"
-                }`}
+                className={`px-2 py-1 rounded w-full text-sm font-medium font-sans
+        ${
+          event.status === "Confirmado"
+            ? "bg-blue-500/70 text-white/70"
+            : "bg-blue-300 text-black/60"
+        }`}
               >
-                {event.title}
+                <div className="leading-tight">
+                  <span className="block font-semibold">
+                    {event.title} {/* Exibe o nome do paciente */}
+                  </span>
+
+                  {event.medicoNome && (
+                    <span
+                      className={`text-xs ${
+                        event.status === "Confirmado"
+                          ? "text-white/80"
+                          : "text-black/80"
+                      }`}
+                    >
+                      Dr(a). {event.medicoNome} {/* Exibe o nome do médico */}
+                    </span>
+                  )}
+                </div>
               </div>
             ),
           }}
@@ -148,6 +165,7 @@ export default function CalendarioAtendimentos({
           <AppointmentForm
             slotInfo={slotSelecionado}
             medicos={medicos}
+            eventos={eventos} // 🔹 Aqui passa os eventos atuais
             onSave={adicionarEvento}
             onCancel={() => setMostrarModalCriar(false)}
           />
@@ -156,7 +174,7 @@ export default function CalendarioAtendimentos({
 
       {eventoSelecionado && (
         <Modal onClose={() => setEventoSelecionado(null)}>
-          <div className="space-y-6">
+          <div className="space-y-6 text-black/80">
             <h2 className="text-xl font-bold text-center">
               📋 Detalhes do Atendimento
             </h2>
@@ -177,7 +195,7 @@ export default function CalendarioAtendimentos({
             <div className="flex gap-4">
               <button
                 onClick={() => excluirEvento(eventoSelecionado.id)}
-                className="flex-1 bg-red-500 text-white py-2 rounded-lg"
+                className="flex-1 bg-cyan-800 hover:bg-cyan-700 text-white py-2 rounded-lg"
               >
                 Excluir
               </button>

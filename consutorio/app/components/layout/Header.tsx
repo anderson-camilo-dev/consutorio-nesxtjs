@@ -14,16 +14,16 @@ export default function Header() {
 
   return (
     <div className="bg-white/95 w-full text-black/80 p-5 relative">
-      <div className="h-20 bg-white grid grid-cols-3 mx-auto rounded-full">
+      <div className="h-20 bg-white max-w-7xl grid grid-cols-3 mx-auto rounded-full">
         {/* LOGO */}
         <div>
           <img className="p-2" width={194} height={11} src="/logo.png" alt="" />
         </div>
 
-        <div className="rounded-full bg-linear-to-t my-2 from-emerald-300 to-cyan-600"></div>
+        <div></div>
 
         {/* IMAGEM DO ATENDENTE */}
-        <div className="justify-items-end p-2 relative">
+        <div className="justify-items-end p-4 relative">
           <div className="grid grid-cols-2 items-center justify-end gap-4">
             <div className="flex rounded-full bg-black/30 mx-auto items-center p-2">
               {/* ícone qualquer */}
@@ -73,7 +73,7 @@ export default function Header() {
         <hr className="my-2" />
 
         <button
-          className="w-full bg-indigo-600 text-white py-2 rounded-lg text-sm"
+          className="w-full bg-cyan-800 hover:bg-cyan-700 text-white py-2 rounded-lg text-sm"
           onClick={() => setShowForm(true)}
         >
           Trocar Atendente
@@ -83,7 +83,7 @@ export default function Header() {
       <div className="text-center space-y-2">
         <p className="text-gray-500 text-sm truncate">Nenhum atendente logado</p>
         <button
-          className="w-full bg-indigo-600 text-white py-2 rounded-lg text-sm"
+          className="w-full bg-cyan-800 text-white py-2 rounded-lg text-sm"
           onClick={() => setShowForm(true)}
         >
           Cadastrar Atendente

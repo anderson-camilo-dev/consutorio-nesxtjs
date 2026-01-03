@@ -45,7 +45,7 @@ export default function AtendentePicker({
 
             <button
               onClick={() => setShowAddForm(true)}
-              className="w-full bg-indigo-600 text-white py-2 rounded-lg"
+              className="w-full bg-cyan-800 text-white py-2 rounded-lg"
             >
               + Adicionar novo atendente
             </button>

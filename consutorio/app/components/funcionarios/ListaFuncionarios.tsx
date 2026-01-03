@@ -16,7 +16,7 @@ export default function ListaFuncionarios({
   onDetails,
 }: ListaFuncionariosProps) {
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 max-w-xs  rounded-lg">
       {!funcionarios || funcionarios.length === 0 ? (
         <p className="text-gray-500">Nenhum funcionário cadastrado.</p>
       ) : (
