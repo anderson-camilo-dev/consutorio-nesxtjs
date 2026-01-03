@@ -9,6 +9,7 @@ import { ptBR } from "date-fns/locale/pt-BR";
 import Modal from "./Modal";
 import AppointmentForm from "./AppointmentForm";
 
+
 const locais = { "pt-BR": ptBR };
 
 const localizador = dateFnsLocalizer({

@@ -1,113 +1,90 @@
 "use client";
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import AtendenteForm from "../atendent/AtendenteForm";
+import AtendentePicker from "../atendent/AtendentePicker";
+import Link from "next/link";
 
 export default function Header() {
-  const defaultAvatar =
-    "https://img.freepik.com/premium-vector/avatar-beautiful-woman-flat-style-close-up-portrait-pretty-young-woman-with-bob-hair-cut_981400-149.jpg?w=360";
+  const defaultAvatar = "https://img.freepik.com/premium-vector/avatar-beautiful-woman-flat-style-close-up-portrait-pretty-young-woman-with-bob-hair-cut_981400-149.jpg?w=360";
 
   const [atendente, setAtendente] = useState<any>(null);
   const [atendentes, setAtendentes] = useState<any[]>([]);
   const [mostrarDropdown, setMostrarDropdown] = useState(false);
   const [showForm, setShowForm] = useState(false);
+  const [showPicker, setShowPicker] = useState(false);
+
+  const carregarDados = () => {
+    const att = localStorage.getItem("atendente");
+    const lista = localStorage.getItem("atendentes");
+    setAtendente(att ? JSON.parse(att) : null);
+    setAtendentes(lista ? JSON.parse(lista) : []);
+  };
+
+  useEffect(() => {
+    carregarDados();
+    window.addEventListener("atendente-change", carregarDados);
+    return () => window.removeEventListener("atendente-change", carregarDados);
+  }, []);
 
   return (
     <div className="bg-white/95 w-full text-black/80 p-5 relative">
       <div className="h-20 bg-white max-w-7xl grid grid-cols-3 mx-auto rounded-full">
-        {/* LOGO */}
         <div>
+          <Link href="./empresa">
           <img className="p-2" width={194} height={11} src="/logo.png" alt="" />
+          </Link>
         </div>
 
         <div></div>
 
-        {/* IMAGEM DO ATENDENTE */}
         <div className="justify-items-end p-4 relative">
           <div className="grid grid-cols-2 items-center justify-end gap-4">
             <div className="flex rounded-full bg-black/30 mx-auto items-center p-2">
-              {/* ícone qualquer */}
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z"
-                  clipRule="evenodd"
-                />
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clipRule="evenodd"/>
               </svg>
             </div>
 
-            <div
-              className="cursor-pointer"
-              onClick={() => setMostrarDropdown((prev) => !prev)}
-            >
-              <img
-                className="w-12 h-12 rounded-full object-cover"
-                src={atendente?.fotoUrl || defaultAvatar}
-                alt="Atendente"
-              />
+            <div className="cursor-pointer" onClick={() => setMostrarDropdown(prev => !prev)}>
+              <img className="w-12 h-12 rounded-full object-cover" src={atendente?.fotoUrl || defaultAvatar} alt="Atendente"/>
             </div>
           </div>
 
-          {/* DROPDOWN MINIMALISTA */}
-{mostrarDropdown && (
-  <div className="absolute right-0 mt-2 w-64 bg-white shadow-lg rounded-lg border border-gray-200 z-50 p-4 break-words">
-    {atendente ? (
-      <div className="space-y-2">
-        <div className="flex items-center gap-3">
-          <img
-            src={atendente.fotoUrl}
-            className="w-12 h-12 rounded-full object-cover"
-            alt={atendente.nome}
-          />
-          <div className="flex-1 min-w-0">
-            <p className="font-medium truncate">{atendente.nome}</p>
-            <p className="text-sm text-gray-500 truncate">{atendente.telefone}</p>
-          </div>
-        </div>
+          {mostrarDropdown && (
+            <div className="absolute right-0 mt-2 w-64 bg-white shadow-lg rounded-lg border border-gray-200 z-50 p-4 break-words">
+              {atendente ? (
+                <div className="space-y-2">
+                  <div className="flex items-center gap-3">
+                    <img src={atendente.fotoUrl} className="w-12 h-12 rounded-full object-cover" alt={atendente.nome} />
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium truncate">{atendente.nome}</p>
+                      <p className="text-sm text-gray-500 truncate">{atendente.telefone}</p>
+                    </div>
+                  </div>
+                  <hr className="my-2" />
+                  <button className="w-full bg-cyan-800 hover:bg-cyan-700 text-white py-2 rounded-lg text-sm" onClick={() => setShowPicker(true)}>Trocar Atendente</button>
+                </div>
+              ) : (
+                <div className="text-center space-y-2">
+                  <p className="text-gray-500 text-sm truncate">Nenhum atendente logado</p>
+                  <button className="w-full bg-cyan-800 text-white py-2 rounded-lg text-sm" onClick={() => setShowPicker(true)}>Cadastrar Atendente</button>
+                </div>
+              )}
 
-        <hr className="my-2" />
-
-        <button
-          className="w-full bg-cyan-800 hover:bg-cyan-700 text-white py-2 rounded-lg text-sm"
-          onClick={() => setShowForm(true)}
-        >
-          Trocar Atendente
-        </button>
-      </div>
-    ) : (
-      <div className="text-center space-y-2">
-        <p className="text-gray-500 text-sm truncate">Nenhum atendente logado</p>
-        <button
-          className="w-full bg-cyan-800 text-white py-2 rounded-lg text-sm"
-          onClick={() => setShowForm(true)}
-        >
-          Cadastrar Atendente
-        </button>
-      </div>
-    )}
-
-    {/* FORMULARIO INLINE */}
-    {showForm && (
-      <div className="mt-3 border-t pt-3">
-        <AtendenteForm
-          onSave={(newAtt) => {
-            setAtendentes((prev) => [...prev, newAtt]);
-            setAtendente(newAtt);
-            setShowForm(false);
-            setMostrarDropdown(false);
-          }}
-          onCancel={() => setShowForm(false)}
-        />
-      </div>
-    )}
-  </div>
-)}
-
+              {showPicker && (
+                <AtendentePicker
+                  atendentes={atendentes}
+                  onSelect={(att) => {
+                    setAtendente(att);
+                    setShowPicker(false);
+                    setMostrarDropdown(false);
+                  }}
+                  onClose={() => setShowPicker(false)}
+                  onAdd={(newAtt) => {}}
+                />
+              )}
+            </div>
+          )}
         </div>
       </div>
     </div>
