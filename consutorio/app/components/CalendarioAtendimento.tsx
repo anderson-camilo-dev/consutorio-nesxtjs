@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useCallback } from "react";
 import { Calendar, dateFnsLocalizer, View } from "react-big-calendar";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import { format, parse, startOfWeek, getDay, isWithinInterval } from "date-fns";
@@ -9,14 +9,15 @@ import { ptBR } from "date-fns/locale/pt-BR";
 import Modal from "./Modal";
 import AppointmentForm from "./AppointmentForm";
 
-const locales = { "pt-BR": ptBR };
 
-const localizer = dateFnsLocalizer({
+const locais = { "pt-BR": ptBR };
+
+const localizador = dateFnsLocalizer({
   format,
   parse,
   startOfWeek,
-  getDay,
-  locales,
+  getDay,AC
+  locales: locais,
 });
 
 interface CalendarioProps {
@@ -35,27 +36,12 @@ export default function CalendarioAtendimentos({
   setDataAtual,
 }: CalendarioProps) {
   const [visualizacaoAtual, setVisualizacaoAtual] = useState<View>("month");
+
   const [mostrarModalCriar, setMostrarModalCriar] = useState(false);
   const [slotSelecionado, setSlotSelecionado] = useState<any>(null);
   const [eventoSelecionado, setEventoSelecionado] = useState<any>(null);
 
-  // 🔹 Carrega eventos do localStorage ao montar
-  useEffect(() => {
-    const eventosSalvos = JSON.parse(localStorage.getItem("eventos") || "[]");
-    const eventosConvertidos = eventosSalvos.map((e: any) => {
-      const start = new Date(e.start);
-      const end = new Date(e.end);
-      return {
-        ...e,
-        start: isNaN(start.getTime()) ? new Date() : start,
-        end: isNaN(end.getTime()) ? new Date() : end,
-      };
-    });
-    if (eventosConvertidos.length > 0) setEventos(eventosConvertidos);
-  }, [setEventos]);
-
-  // Navegação e visualização
-  const aoNavegar = useCallback((novaData: Date) => setDataAtual(novaData), [setDataAtual]);
+  const aoNavegar = useCallback((novaData: Date) => setDataAtual(novaData), []);
   const aoTrocarVisualizacao = useCallback(
     (novaVis: View) => setVisualizacaoAtual(novaVis),
     []
@@ -70,23 +56,17 @@ export default function CalendarioAtendimentos({
     setMostrarModalCriar(true);
   }, []);
 
-  // Adiciona evento e salva no localStorage
   const adicionarEvento = (evento: any) => {
-    const novoEvento = { ...evento, id: Date.now().toString() };
-    const novosEventos = [...eventos, novoEvento];
-    setEventos(novosEventos);
-    localStorage.setItem("eventos", JSON.stringify(novosEventos));
+    setEventos((prev) => [...prev, { ...evento, id: Date.now().toString() }]);
     setMostrarModalCriar(false);
   };
 
   const excluirEvento = (eventoId: string) => {
-    const novosEventos = eventos.filter((e) => e.id !== eventoId);
-    setEventos(novosEventos);
-    localStorage.setItem("eventos", JSON.stringify(novosEventos));
+    setEventos((prev) => prev.filter((e) => e.id !== eventoId));
     setEventoSelecionado(null);
   };
 
-  // Adiciona bolinha vermelha se tiver médico no dia
+  // bolinha vermelha se tiver médico no dia
   const dayPropGetter = (date: Date) => {
     const temMedico = medicos.some((med) => {
       if (!med.dataInicio || !med.dataFim) return false;
@@ -103,7 +83,7 @@ export default function CalendarioAtendimentos({
 
   return (
     <>
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex items-center  justify-between mb-4">
         <h1 className="text-3xl font-bold text-gray-800">
           📅 Agenda de Atendimentos
         </h1>
@@ -118,9 +98,9 @@ export default function CalendarioAtendimentos({
         </button>
       </div>
 
-      <div className="bg-white/70 text-black/50 rounded-lg shadow-md p-4 h-[700px]">
+      <div className="bg-white/70  text-black/50  rounded-lg shadow-md p-4 h-[700px]">
         <Calendar
-          localizer={localizer}
+          localizer={localizador}
           events={eventos}
           startAccessor="start"
           endAccessor="end"
@@ -152,18 +132,26 @@ export default function CalendarioAtendimentos({
             event: ({ event }: any) => (
               <div
                 className={`px-2 py-1 rounded w-full text-sm font-medium font-sans
-                ${event.status === "Confirmado"
-                  ? "bg-blue-500/70 text-white/70"
-                  : "bg-blue-300 text-black/60"
-                }`}
+        ${
+          event.status === "Confirmado"
+            ? "bg-blue-500/70 text-white/70"
+            : "bg-blue-300 text-black/60"
+        }`}
               >
                 <div className="leading-tight">
-                  <span className="block font-semibold">{event.title}</span>
+                  <span className="block font-semibold">
+                    {event.title} {/* Exibe o nome do paciente */}
+                  </span>
+
                   {event.medicoNome && (
                     <span
-                      className={`text-xs ${event.status === "Confirmado" ? "text-white/80" : "text-black/80"}`}
+                      className={`text-xs ${
+                        event.status === "Confirmado"
+                          ? "text-white/80"
+                          : "text-black/80"
+                      }`}
                     >
-                      Dr(a). {event.medicoNome}
+                      Dr(a). {event.medicoNome} {/* Exibe o nome do médico */}
                     </span>
                   )}
                 </div>
@@ -178,7 +166,7 @@ export default function CalendarioAtendimentos({
           <AppointmentForm
             slotInfo={slotSelecionado}
             medicos={medicos}
-            eventos={eventos}
+            eventos={eventos} // 🔹 Aqui passa os eventos atuais
             onSave={adicionarEvento}
             onCancel={() => setMostrarModalCriar(false)}
           />
@@ -188,18 +176,21 @@ export default function CalendarioAtendimentos({
       {eventoSelecionado && (
         <Modal onClose={() => setEventoSelecionado(null)}>
           <div className="space-y-6 text-black/80">
-            <h2 className="text-xl font-bold text-center">📋 Detalhes do Atendimento</h2>
+            <h2 className="text-xl font-bold text-center">
+              📋 Detalhes do Atendimento
+            </h2>
 
             <p>
               <strong>Paciente:</strong> {eventoSelecionado.title}
             </p>
             <p>
-              <strong>Data:</strong> {format(new Date(eventoSelecionado.start), "dd/MM/yyyy")}
+              <strong>Data:</strong>{" "}
+              {format(eventoSelecionado.start, "dd/MM/yyyy")}
             </p>
             <p>
               <strong>Horário:</strong>{" "}
-              {format(new Date(eventoSelecionado.start), "HH:mm")} -{" "}
-              {format(new Date(eventoSelecionado.end), "HH:mm")}
+              {format(eventoSelecionado.start, "HH:mm")} -{" "}
+              {format(eventoSelecionado.end, "HH:mm")}
             </p>
 
             <div className="flex gap-4">

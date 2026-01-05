@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 
-import Header from "../components/layout/Header";
+
 import AtendentePicker from "../components/atendent/AtendentePicker";
 import CalendarioAtendimentos from "../components/CalendarioAtendimento";
 import MiniCalendario from "../components/MiniCalendario";
@@ -11,6 +11,7 @@ import FuncionarioForm from "../components/funcionarios/FuncionariosForm";
 import Modal from "../components/Modal";
 import AppointmentForm from "../components/AppointmentForm";
 import AtendimentoChart from "../components/AtendimentoChart";
+
 
 export default function Home() {
   const [eventos, setEventos] = useState<any[]>([]);
@@ -74,7 +75,7 @@ export default function Home() {
 
   return (
     <>
-      <Header />
+      
 
       <main className="min-h-screen bg-white/95 p-6 space-y-6">
         <div className="max-w-7xl mx-auto grid grid-cols-7">
