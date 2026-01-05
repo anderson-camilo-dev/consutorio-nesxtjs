@@ -9,7 +9,7 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const atendente = localStorage.getItem("atendente");
+    const atendente = localStorage.getItem("atendent");
     if (atendente) {
       router.replace("/calendario");
     } else {

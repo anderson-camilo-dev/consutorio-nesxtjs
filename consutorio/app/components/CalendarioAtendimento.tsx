@@ -16,7 +16,7 @@ const localizador = dateFnsLocalizer({
   format,
   parse,
   startOfWeek,
-  getDay,
+  getDay,AC
   locales: locais,
 });
 

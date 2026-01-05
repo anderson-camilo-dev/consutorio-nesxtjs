@@ -1,15 +1,17 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Header from "../components/layout/Header";
-import Modal from "../components/Modal";
+
+
 import AtendentePicker from "../components/atendent/AtendentePicker";
 import CalendarioAtendimentos from "../components/CalendarioAtendimento";
 import MiniCalendario from "../components/MiniCalendario";
 import ListaFuncionarios from "../components/funcionarios/ListaFuncionarios";
 import FuncionarioForm from "../components/funcionarios/FuncionariosForm";
+import Modal from "../components/Modal";
 import AppointmentForm from "../components/AppointmentForm";
 import AtendimentoChart from "../components/AtendimentoChart";
+
 
 export default function Home() {
   const [eventos, setEventos] = useState<any[]>([]);
@@ -18,16 +20,19 @@ export default function Home() {
   const [funcionarios, setFuncionarios] = useState<any[]>([]);
   const [mostrarModalFunc, setMostrarModalFunc] = useState(false);
   const [funcionarioParaEditar, setFuncionarioParaEditar] = useState<any>(null);
-  const [mostrarDetalhesFunc, setMostrarDetalhesFunc] = useState(false);
-  const [funcionarioDetalhes, setFuncionarioDetalhes] = useState<any>(null);
 
   const [mostrarModalAgendamento, setMostrarModalAgendamento] = useState(false);
 
-  // Modal Picker inicial (login ou trocar atendente)
   const [showPickerInicial, setShowPickerInicial] = useState(false);
 
+  // 🔹 Carrega dados do localStorage na inicialização
   useEffect(() => {
-    // Se não houver atendente logado, abre Picker
+    const dadosFunc = JSON.parse(localStorage.getItem("funcionarios") || "[]");
+    const eventosSalvos = JSON.parse(localStorage.getItem("eventos") || "[]");
+
+    setFuncionarios(dadosFunc);
+    setEventos(eventosSalvos);
+
     const att = localStorage.getItem("atendente");
     if (!att) setShowPickerInicial(true);
   }, []);
@@ -36,8 +41,14 @@ export default function Home() {
   const salvarFuncionario = (func: any) => {
     setFuncionarios((prev) => {
       const existe = prev.find((f) => f.id === func.id);
-      if (existe) return prev.map((f) => (f.id === func.id ? func : f));
-      return [...prev, func];
+      let novos;
+      if (existe) {
+        novos = prev.map((f) => (f.id === func.id ? func : f));
+      } else {
+        novos = [...prev, func];
+      }
+      localStorage.setItem("funcionarios", JSON.stringify(novos));
+      return novos;
     });
     setMostrarModalFunc(false);
     setFuncionarioParaEditar(null);
@@ -49,26 +60,25 @@ export default function Home() {
   };
 
   const excluirFuncionario = (id: string) => {
-    setFuncionarios((prev) => prev.filter((f) => f.id !== id));
-  };
-
-  const verDetalhesFuncionario = (func: any) => {
-    setFuncionarioDetalhes(func);
-    setMostrarDetalhesFunc(true);
+    const novosFuncionarios = funcionarios.filter((f) => f.id !== id);
+    setFuncionarios(novosFuncionarios);
+    localStorage.setItem("funcionarios", JSON.stringify(novosFuncionarios));
   };
 
   // Funções agendamento
   const salvarAgendamento = (evento: any) => {
-    setEventos((prev) => [...prev, evento]);
+    const novosEventos = [...eventos, evento];
+    setEventos(novosEventos);
+    localStorage.setItem("eventos", JSON.stringify(novosEventos));
     setMostrarModalAgendamento(false);
   };
 
   return (
     <>
-      <Header />
+      
 
       <main className="min-h-screen bg-white/95 p-6 space-y-6">
-        <div className="max-w-7xl mx-auto grid grid-cols-7 ">
+        <div className="max-w-7xl mx-auto grid grid-cols-7">
           <div className="col-span-2 pt-14 space-y-6">
             <MiniCalendario
               eventos={eventos}
@@ -85,7 +95,6 @@ export default function Home() {
                 funcionarios={funcionarios}
                 onEdit={editarFuncionario}
                 onDelete={excluirFuncionario}
-                onDetails={verDetalhesFuncionario}
               />
             </section>
 
@@ -133,32 +142,14 @@ export default function Home() {
           </Modal>
         )}
 
-        {/* Modal detalhes funcionário */}
-        {mostrarDetalhesFunc && funcionarioDetalhes && (
-          <Modal onClose={() => setMostrarDetalhesFunc(false)}>
-            <div className="space-y-4 text-gray-800">
-              <h2 className="text-2xl font-bold text-center">{funcionarioDetalhes.nome}</h2>
-              <p><strong>Telefone:</strong> {funcionarioDetalhes.telefone}</p>
-              <p><strong>Cargo:</strong> {funcionarioDetalhes.cargo}</p>
-              <p>
-                <strong>Plantão:</strong> {funcionarioDetalhes.horarioInicio} - {funcionarioDetalhes.horarioFim}
-              </p>
-              {funcionarioDetalhes.fotoUrl && (
-                <img src={funcionarioDetalhes.fotoUrl} className="w-32 h-32 rounded-full object-cover mx-auto" alt={funcionarioDetalhes.nome} />
-              )}
-            </div>
-          </Modal>
-        )}
-
         <div className="max-w-7xl mx-auto rounded-lg my-6">
           <AtendimentoChart eventos={eventos} />
         </div>
       </main>
 
-      {/* Picker inicial */}
       {showPickerInicial && (
         <AtendentePicker
-          onSelect={(att) => setShowPickerInicial(false)}
+          onSelect={() => setShowPickerInicial(false)}
           onClose={() => setShowPickerInicial(false)}
           onAdd={() => {}}
         />

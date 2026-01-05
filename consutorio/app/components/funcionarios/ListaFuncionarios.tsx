@@ -1,6 +1,6 @@
 "use client";
 
-import FuncionarioCard from "./FuncionariosCard";
+import FuncionarioCard from "./funcionariosCards";
 
 
 interface ListaFuncionariosProps {
