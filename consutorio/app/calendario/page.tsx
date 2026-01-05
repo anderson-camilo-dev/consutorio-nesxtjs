@@ -12,7 +12,6 @@ import Modal from "../components/Modal";
 import AppointmentForm from "../components/AppointmentForm";
 import AtendimentoChart from "../components/AtendimentoChart";
 
-
 export default function Home() {
   const [eventos, setEventos] = useState<any[]>([]);
   const [dataAtual, setDataAtual] = useState(new Date());
@@ -65,6 +64,12 @@ export default function Home() {
     localStorage.setItem("funcionarios", JSON.stringify(novosFuncionarios));
   };
 
+  // Função para exibir detalhes do funcionário
+  const exibirDetalhesFuncionario = (func: any) => {
+    console.log("Detalhes do funcionário:", func);
+    // Você pode adicionar aqui a lógica para mostrar um modal ou outra coisa
+  };
+
   // Funções agendamento
   const salvarAgendamento = (evento: any) => {
     const novosEventos = [...eventos, evento];
@@ -75,7 +80,7 @@ export default function Home() {
 
   return (
     <>
-      
+
 
       <main className="min-h-screen bg-white/95 p-6 space-y-6">
         <div className="max-w-7xl mx-auto grid grid-cols-7">
@@ -95,6 +100,7 @@ export default function Home() {
                 funcionarios={funcionarios}
                 onEdit={editarFuncionario}
                 onDelete={excluirFuncionario}
+                onDetails={exibirDetalhesFuncionario}  
               />
             </section>
 

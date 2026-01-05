@@ -9,14 +9,13 @@ import { ptBR } from "date-fns/locale/pt-BR";
 import Modal from "./Modal";
 import AppointmentForm from "./AppointmentForm";
 
-
 const locais = { "pt-BR": ptBR };
 
 const localizador = dateFnsLocalizer({
   format,
   parse,
   startOfWeek,
-  getDay,AC
+  getDay,
   locales: locais,
 });
 
@@ -36,7 +35,6 @@ export default function CalendarioAtendimentos({
   setDataAtual,
 }: CalendarioProps) {
   const [visualizacaoAtual, setVisualizacaoAtual] = useState<View>("month");
-
   const [mostrarModalCriar, setMostrarModalCriar] = useState(false);
   const [slotSelecionado, setSlotSelecionado] = useState<any>(null);
   const [eventoSelecionado, setEventoSelecionado] = useState<any>(null);
@@ -66,8 +64,8 @@ export default function CalendarioAtendimentos({
     setEventoSelecionado(null);
   };
 
-  // bolinha vermelha se tiver médico no dia
-  const dayPropGetter = (date: Date) => {
+  // 🔹 Corrigido dayPropGetter
+  const dayPropGetter = (date: Date): React.HTMLAttributes<HTMLDivElement> => {
     const temMedico = medicos.some((med) => {
       if (!med.dataInicio || !med.dataFim) return false;
       const inicio = new Date(med.dataInicio);
@@ -75,15 +73,16 @@ export default function CalendarioAtendimentos({
       return isWithinInterval(date, { start: inicio, end: fim });
     });
 
+    // Retornando apenas className e estilo compatível
     return {
-      style: { position: "relative" },
       className: temMedico ? "tem-medico" : "",
+      style: { position: "relative" } as React.CSSProperties,
     };
   };
 
   return (
     <>
-      <div className="flex items-center  justify-between mb-4">
+      <div className="flex items-center justify-between mb-4">
         <h1 className="text-3xl font-bold text-gray-800">
           📅 Agenda de Atendimentos
         </h1>
@@ -98,7 +97,7 @@ export default function CalendarioAtendimentos({
         </button>
       </div>
 
-      <div className="bg-white/70  text-black/50  rounded-lg shadow-md p-4 h-[700px]">
+      <div className="bg-white/70 text-black/50 rounded-lg shadow-md p-4 h-[700px]">
         <Calendar
           localizer={localizador}
           events={eventos}
@@ -132,17 +131,14 @@ export default function CalendarioAtendimentos({
             event: ({ event }: any) => (
               <div
                 className={`px-2 py-1 rounded w-full text-sm font-medium font-sans
-        ${
-          event.status === "Confirmado"
-            ? "bg-blue-500/70 text-white/70"
-            : "bg-blue-300 text-black/60"
-        }`}
+                  ${
+                    event.status === "Confirmado"
+                      ? "bg-blue-500/70 text-white/70"
+                      : "bg-blue-300 text-black/60"
+                  }`}
               >
                 <div className="leading-tight">
-                  <span className="block font-semibold">
-                    {event.title} {/* Exibe o nome do paciente */}
-                  </span>
-
+                  <span className="block font-semibold">{event.title}</span>
                   {event.medicoNome && (
                     <span
                       className={`text-xs ${
@@ -151,7 +147,7 @@ export default function CalendarioAtendimentos({
                           : "text-black/80"
                       }`}
                     >
-                      Dr(a). {event.medicoNome} {/* Exibe o nome do médico */}
+                      Dr(a). {event.medicoNome}
                     </span>
                   )}
                 </div>
@@ -166,7 +162,7 @@ export default function CalendarioAtendimentos({
           <AppointmentForm
             slotInfo={slotSelecionado}
             medicos={medicos}
-            eventos={eventos} // 🔹 Aqui passa os eventos atuais
+            eventos={eventos}
             onSave={adicionarEvento}
             onCancel={() => setMostrarModalCriar(false)}
           />

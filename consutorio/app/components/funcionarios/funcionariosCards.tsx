@@ -6,12 +6,14 @@ interface FuncionarioCardProps {
   funcionario: any;
   onEdit: (f: any) => void;
   onDelete: (id: string) => void;
+  onDetails: (f: any) => void; // 🔹 adicionamos a prop onDetails
 }
 
 export default function FuncionarioCard({
   funcionario,
   onEdit,
   onDelete,
+  onDetails,
 }: FuncionarioCardProps) {
   const router = useRouter();
 
@@ -36,9 +38,9 @@ export default function FuncionarioCard({
       </div>
 
       <div className="flex gap-2">
-        {/* Botão lupa → leva para página do médico */}
+        {/* Botão detalhes → chama a função onDetails */}
         <button
-          onClick={() => router.push(`/medicos/${funcionario.id}`)}
+          onClick={() => onDetails(funcionario)}
           className="text-cyan-800 hover:text-cyan-700"
           title="Ver detalhes"
         >
