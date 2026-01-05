@@ -2,6 +2,7 @@
 
 import FuncionarioCard from "./FuncionariosCard";
 
+
 interface ListaFuncionariosProps {
   funcionarios?: any[];
   onEdit: (f: any) => void;

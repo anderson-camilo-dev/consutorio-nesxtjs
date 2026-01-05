@@ -1,18 +1,20 @@
 "use client";
 
+import { useRouter } from "next/navigation";
+
 interface FuncionarioCardProps {
   funcionario: any;
   onEdit: (f: any) => void;
   onDelete: (id: string) => void;
-  onDetails: (f: any) => void;
 }
 
 export default function FuncionarioCard({
   funcionario,
   onEdit,
   onDelete,
-  onDetails,
 }: FuncionarioCardProps) {
+  const router = useRouter();
+
   return (
     <div className="flex items-center gap-2 bg-white p-4 rounded-lg shadow">
       {funcionario.fotoUrl ? (
@@ -34,9 +36,11 @@ export default function FuncionarioCard({
       </div>
 
       <div className="flex gap-2">
+        {/* Botão lupa → leva para página do médico */}
         <button
-          onClick={() => onDetails(funcionario)}
+          onClick={() => router.push(`/medicos/${funcionario.id}`)}
           className="text-cyan-800 hover:text-cyan-700"
+          title="Ver detalhes"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -53,11 +57,13 @@ export default function FuncionarioCard({
             />
           </svg>
         </button>
+
+        {/* Botão editar */}
         <button
           onClick={() => onEdit(funcionario)}
           className="text-cyan-800 hover:text-cyan-700"
+          title="Editar"
         >
-          {" "}
           <svg
             xmlns="http://www.w3.org/2000/svg"
             className="h-6 w-6"
@@ -73,9 +79,12 @@ export default function FuncionarioCard({
             />
           </svg>
         </button>
+
+        {/* Botão deletar */}
         <button
           onClick={() => onDelete(funcionario.id)}
           className="text-cyan-800 hover:text-cyan-700"
+          title="Excluir"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
