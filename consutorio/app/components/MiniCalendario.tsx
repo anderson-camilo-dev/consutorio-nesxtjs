@@ -47,7 +47,7 @@ export default function MiniCalendario({
       <div className="flex justify-between items-center mb-2">
         <button
           onClick={prevMonth}
-          className="text-indigo-600 hover:text-indigo-800 font-bold"
+          className="text-cyan-800 hover:text-cyan-700 font-bold"
         >
           {"<"}
         </button>
@@ -56,7 +56,7 @@ export default function MiniCalendario({
         </h2>
         <button
           onClick={nextMonth}
-          className="text-indigo-600 hover:text-indigo-800 font-bold"
+          className="text-cyan-800 hover:text-cyan-700 font-bold"
         >
           {">"}
         </button>
